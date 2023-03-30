@@ -1,4 +1,8 @@
 node_modules
 bin
+<<<<<<< HEAD
 index.js
 .env
+=======
+index.js
+>>>>>>> 3f8f537078c4eac999fa9ec428d4edf216f7d020
