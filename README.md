@@ -1,1 +1,1 @@
-# jdev-music-player-backend
+# jdev-restaurant-rating-backend
