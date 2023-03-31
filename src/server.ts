@@ -1,8 +1,13 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import { createServer, Server } from 'http'
-
 import cors from 'cors'
+import UserDomain from './domain/user'
+import {UserModel} from './models/user'
+
+import { DBConnect } from './db/dbconnect'
+import { Sequelize } from 'sequelize'
+import UserHandler from './handlers/user'
 
 class MusicPlayerAPIService {
   public static readonly PORT: number = 5000
@@ -10,12 +15,15 @@ class MusicPlayerAPIService {
   private port: string | number
   private expressApp: express.Application
   private server: Server
+  private dbConnection: Sequelize | null
 
-  constructor() {
+  constructor(dbConnection: Sequelize | null) {
     this.expressApp = express()
     this.port = process.env.SERVER_PORT || MusicPlayerAPIService.PORT
     this.expressApp.use(cors())
     this.expressApp.use(express.json())
+
+    this.dbConnection = dbConnection
 
     this.setupRoutes()
 
@@ -28,6 +36,9 @@ class MusicPlayerAPIService {
   }
 
   private setupRoutes(): void {
+    const userDomain = new UserDomain(this.dbConnection, 'users', UserModel(this.dbConnection))
+    
+    new UserHandler(this.expressApp, userDomain)
   }
 
   private listen(): void {
@@ -40,7 +51,16 @@ class MusicPlayerAPIService {
 }
 
 async function musicPlayerApp() {
-  const app = new MusicPlayerAPIService().app
+  const env = {
+    dbName: process.env.DB_NAME || 'postgres',
+    dbHost: process.env.DB_HOST || 'localhost',
+    dbUser: process.env.DB_USER || 'postgres',
+    dbPass: process.env.DB_PASS || 'mysecretpassword',
+  }
+  const pgConnect = new DBConnect(env.dbHost, env.dbName, env.dbUser, env.dbPass)
+  await pgConnect.connect()
+
+  const app = new MusicPlayerAPIService(pgConnect.getConnection()).app
   return app
 }
 
