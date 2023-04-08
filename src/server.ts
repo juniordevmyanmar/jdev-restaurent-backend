@@ -2,12 +2,14 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import { createServer, Server } from 'http'
 import cors from 'cors'
-import UserDomain from './domain/user'
-import {UserModel} from './models/user'
+import UserDomain from './domain/authentication'
+import UserModel from './models/user'
 
 import { DBConnect } from './db/dbconnect'
 import { Sequelize } from 'sequelize'
-import UserHandler from './handlers/user'
+import UserHandler from './handlers/authentication'
+import { errorHandler } from './validator/validatorError'
+import HealthCheckHandler from './handlers/health'
 
 class MusicPlayerAPIService {
   public static readonly PORT: number = 5000
@@ -15,11 +17,12 @@ class MusicPlayerAPIService {
   private port: string | number
   private expressApp: express.Application
   private server: Server
-  private dbConnection: Sequelize | null
+  private dbConnection: Sequelize
 
-  constructor(dbConnection: Sequelize | null) {
-    this.expressApp = express()
+  constructor(dbConnection: Sequelize) {
     this.port = process.env.SERVER_PORT || MusicPlayerAPIService.PORT
+
+    this.expressApp = express()
     this.expressApp.use(cors())
     this.expressApp.use(express.json())
 
@@ -37,13 +40,16 @@ class MusicPlayerAPIService {
 
   private setupRoutes(): void {
     const userDomain = new UserDomain(this.dbConnection, 'users', UserModel(this.dbConnection))
-    
+
     new UserHandler(this.expressApp, userDomain)
+    new HealthCheckHandler(this.expressApp)
   }
 
   private listen(): void {
     this.expressApp.use(bodyParser.urlencoded({ extended: false }))
     this.expressApp.use(bodyParser.json())
+    this.expressApp.use(errorHandler)
+
     this.server.listen(this.port, () => {
       process.stdout.write(`Running server on port ${this.port}\n`)
     })
@@ -58,7 +64,14 @@ async function musicPlayerApp() {
     dbPass: process.env.DB_PASS || 'mysecretpassword',
   }
   const pgConnect = new DBConnect(env.dbHost, env.dbName, env.dbUser, env.dbPass)
-  await pgConnect.connect()
+
+  try {
+    // check if db is already connected
+    // if db connection is successful, it will automatically create table.
+    pgConnect.dbInit()
+  } catch (err) {
+    console.error(err)
+  }
 
   const app = new MusicPlayerAPIService(pgConnect.getConnection()).app
   return app
