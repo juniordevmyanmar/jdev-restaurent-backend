@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to dev:debug",
+            "protocol": "inspector",
+            "port": 4321,
+            "restart": true,
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "DB_NAME": "db_restaurant",
+                "DB_HOST": "postgres",
+                "DB_USER": "admin",
+                "DB_PASS": "password"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug",
+            "protocol": "inspector",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev"
+            ],
+            "env": {
+                "DB_NAME": "db_restaurant",
+                "DB_HOST": "postgres",
+                "DB_USER": "admin",
+                "DB_PASS": "password"
+            }
+        }
+    ]
+}

@@ -1,4 +1,16 @@
-# jdev-restaurant-rating-backend
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Creating DB on your docker container](#creating-db-on-your-docker-container)
+  * [Tips: in case if you want to reset the whole database](#tips--in-case-if-you-want-to-reset-the-whole-database)
+- [Database Migrations](#database-migrations)
+- [Migrations](#migrations)
+  * [Reverting Migrations](#reverting-migrations)
+  * [Generating seed data](#generating-seed-data)
+  * [Reverting Seed Data](#reverting-seed-data)
+- [Rebuilding the docker-compose](#rebuilding-the-docker-compose)
+- [Stopping the docker-compose after your development](#stopping-the-docker-compose-after-your-development)
+
+
 
 ## Prerequisites
 

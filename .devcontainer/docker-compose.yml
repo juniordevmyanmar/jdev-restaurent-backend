@@ -1,0 +1,42 @@
+version: "3"
+services:
+  postgres:
+    restart: unless-stopped
+    image: postgres:13.6-alpine3.15
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db_restaurant
+    # Enable this to persist your changes    
+    # volumes:
+    #   - ./postgres-data/postgres:/var/lib/postgresql/data
+  server:
+    build: .
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "${PORT}:8000"
+      
+    environment:
+      - DB_NAME=db_restaurant
+      - DB_HOST=postgres
+      - DB_USER=admin
+      - DB_PASS=password
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    volumes:
+      - ../:/home/node/app:cached
+      - $HOME/.ssh/:/home/node/.ssh/
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - '4000:80'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@jdmm.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+    links:
+      - postgres
+    depends_on:
+      - postgres
