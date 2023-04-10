@@ -1,6 +1,6 @@
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcrypt')
-const generateRandomName = require('./helper/gen-name');
+const generateRandomName = require('./helper/gen-name')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -14,15 +14,23 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-    return queryInterface.bulkInsert('Users', await Promise.all(Array.from(Array(3)).map(async (_, x) => ({
-      id: uuidv4(),
-      name: generateRandomName(),
-      email: `user${x + 1}@jd.co`,
-      password: await bcrypt.hash(`qwer123`, 10),
-      phone: `+95${Array.from(Array(10)).map(() => Math.floor(Math.random() * 10)).join('')}`,
-      createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
-      updatedAt: Sequelize.literal('CURRENT_TIMESTAMP')
-    }))), {});
+    return queryInterface.bulkInsert(
+      'Users',
+      await Promise.all(
+        Array.from(Array(3)).map(async (_, x) => ({
+          id: uuidv4(),
+          name: generateRandomName(),
+          email: `user${x + 1}@jd.co`,
+          password: await bcrypt.hash(`qwer123`, 10),
+          phone: `+95${Array.from(Array(10))
+            .map(() => Math.floor(Math.random() * 10))
+            .join('')}`,
+          createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+          updatedAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+        })),
+      ),
+      {},
+    )
   },
 
   down: (queryInterface, Sequelize) => {
@@ -33,6 +41,6 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('Person', null, {});
     */
-    return queryInterface.bulkDelete('Users', null, {});
-  }
-};
+    return queryInterface.bulkDelete('Users', null, {})
+  },
+}

@@ -1,9 +1,9 @@
-'use strict';
-const { v4: uuidv4 } = require('uuid');
-const generateMyanmarAddress = require("./helper/gen-address");
-const generateImages = require("./helper/gen-image");
-const generateRandomName = require('./helper/gen-name');
-const { generateCuisines, cuisineLists } = require('./helper/gen-cuisines');
+'use strict'
+const { v4: uuidv4 } = require('uuid')
+const generateMyanmarAddress = require('./helper/gen-address')
+const generateImages = require('./helper/gen-image')
+const generateRandomName = require('./helper/gen-name')
+const { generateCuisines, cuisineLists } = require('./helper/gen-cuisines')
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -18,12 +18,16 @@ module.exports = {
       }], {});
     */
 
-    return queryInterface.bulkInsert('Cuisines', Array.from(cuisineLists).map((x) => ({
-      id: x,
-      name: `${generateRandomName()} Cuisine`,
-      createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
-      updatedAt: Sequelize.literal('CURRENT_TIMESTAMP')
-    })), {});
+    return queryInterface.bulkInsert(
+      'Cuisines',
+      Array.from(cuisineLists).map((x) => ({
+        id: x,
+        name: `${generateRandomName()} Cuisine`,
+        createdAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+        updatedAt: Sequelize.literal('CURRENT_TIMESTAMP'),
+      })),
+      {},
+    )
   },
 
   down: (queryInterface, Sequelize) => {
@@ -35,5 +39,5 @@ module.exports = {
       return queryInterface.bulkDelete('Person', null, {});
     */
     return queryInterface.bulkDelete('Cuisines', null, {})
-  }
-};
+  },
+}

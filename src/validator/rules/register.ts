@@ -14,7 +14,6 @@ export class CreateUserRequestRule {
   @MaxLength(50)
   address!: string
 
-
   @IsOptional()
   @MaxLength(20)
   phone!: string

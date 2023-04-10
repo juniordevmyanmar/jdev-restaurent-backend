@@ -2,6 +2,9 @@ import { Log } from '../utils/log'
 import { Sequelize } from 'sequelize'
 
 import UserModel from '../models/user'
+import MenuModel from '../models/menu'
+import CuisineModel from '../models/cuisine'
+import RestaurantModel from '../models/restaurant'
 
 export class DBConnect {
   private connection: Sequelize
@@ -27,6 +30,9 @@ export class DBConnect {
 
   public dbInit() {
     UserModel(this.connection)
+    MenuModel(this.connection)
+    CuisineModel(this.connection)
+    RestaurantModel(this.connection)
     // .sync({ alter: true })
   }
 }

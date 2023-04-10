@@ -39,7 +39,7 @@ class MusicPlayerAPIService {
   }
 
   private setupRoutes(): void {
-    const userDomain = new UserDomain(this.dbConnection, 'users', UserModel(this.dbConnection))
+    const userDomain = new UserDomain(this.dbConnection, 'Users')
 
     new UserHandler(this.expressApp, userDomain)
     new HealthCheckHandler(this.expressApp)
