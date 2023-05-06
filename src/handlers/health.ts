@@ -21,12 +21,7 @@ export default class HealthCheckHandler extends BaseHandler {
   }
 
   private async healthCheck(
-    req: core.Request<
-      {},
-      any,
-      any,
-      Record<string, any>
-    >,
+    req: core.Request<{}, any, any, Record<string, any>>,
     res: core.Response<any, Record<string, any>, number>,
   ) {
     res.status(200).json(this.resBody({ message: 'success' }))

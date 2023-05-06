@@ -1,4 +1,8 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize, Model } from 'sequelize'
+import CuisineModel, { Cuisine } from '../models/cuisine'
+import MenuModel, { Menu } from '../models/menu'
+import RestaurantModel, { Restaurant } from '../models/restaurant'
+import UserModel, { User } from '../models/user'
 
 export default class BaseDomain {
   protected connection: Sequelize | null
@@ -10,6 +14,15 @@ export default class BaseDomain {
 
   getConnection(): Sequelize | null {
     return this.connection
+  }
+
+  getORM(tblName: string): Model<Cuisine | Menu | Restaurant | User> {
+    return {
+      users: UserModel(this.connection),
+      menus: MenuModel(this.connection),
+      cuisines: CuisineModel(this.connection),
+      restaurants: RestaurantModel(this.connection),
+    }[tblName]
   }
 
   escapeSQLStr(str: string): string {

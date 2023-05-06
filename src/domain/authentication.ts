@@ -12,9 +12,9 @@ import bcrypt from 'bcrypt'
 export default class UserDomain extends BaseDomain {
   private user: any
 
-  constructor(db: Sequelize | null, tblName: string, userModel: any) {
+  constructor(db: Sequelize | null, tblName: string) {
     super(db, tblName)
-    this.user = userModel
+    this.user = this.getORM(tblName)
   }
 
   public async createUser(

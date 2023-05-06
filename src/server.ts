@@ -10,6 +10,8 @@ import { Sequelize } from 'sequelize'
 import UserHandler from './handlers/authentication'
 import { errorHandler } from './validator/validatorError'
 import HealthCheckHandler from './handlers/health'
+import CrudDomain from './domain/crud'
+import CrudHandler from './handlers/crud'
 
 class MusicPlayerAPIService {
   public static readonly PORT: number = 5000
@@ -39,9 +41,11 @@ class MusicPlayerAPIService {
   }
 
   private setupRoutes(): void {
-    const userDomain = new UserDomain(this.dbConnection, 'users', UserModel(this.dbConnection))
+    const userDomain = new UserDomain(this.dbConnection, 'Users')
+    const crudDomain = new CrudDomain(this.dbConnection, 'Menu')
 
     new UserHandler(this.expressApp, userDomain)
+    new CrudHandler(this.expressApp, crudDomain)
     new HealthCheckHandler(this.expressApp)
   }
 

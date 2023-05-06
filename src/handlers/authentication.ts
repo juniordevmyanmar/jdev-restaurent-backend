@@ -31,7 +31,7 @@ export default class UserHandler extends BaseHandler {
 
   private async createUser(
     req: core.Request<
-      { name: string; email?: string; password?: string; phone?: string, address?: string },
+      { name: string; email?: string; password?: string; phone?: string; address?: string },
       { data: { name: string; email?: string; password?: string; address?: string } },
       any,
       Record<string, any>
