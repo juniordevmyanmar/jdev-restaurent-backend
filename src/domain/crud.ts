@@ -1,4 +1,4 @@
-import { Sequelize, UniqueConstraintError, ValidationErrorItem } from 'sequelize-typescript'
+import { Sequelize, UniqueConstraintError, ValidationErrorItem } from 'sequelize'
 import { Log } from '../utils/log'
 import BaseDomain from './base'
 import { DataTypes, Model, Optional, UUIDV4 } from 'sequelize'
@@ -25,6 +25,11 @@ export default class CrudDomain extends BaseDomain {
     this.resource = this.getORM(tblName)
   }
 
+  public getCrudDomain(tblName: string): CrudDomain {
+    this.resource = this.getORM(tblName)
+    return this
+  }
+
   public async create(res: res): Promise<{ id: string } | undefined> {
     try {
       const output = await this.resource?.create(res)
@@ -47,11 +52,11 @@ export default class CrudDomain extends BaseDomain {
     }
   }
 
-  public async GetAll(limit: number, offset: number): Promise<Array<res>> {
+  public async GetAll(limit: number = 10, offset: number = 1): Promise<Array<res>> {
     try {
       const output = await this.resource.findAll({
-        limit: 10, // limits the number of results to 10
-        offset: 5, // skips the first 5 results
+        limit: limit, // limits the number of results to 10
+        offset: offset, // skips the first 5 results
       })
       return output
     } catch (e: any) {
@@ -87,7 +92,7 @@ export default class CrudDomain extends BaseDomain {
         throw new ResourceNotFoundError(`${typeof this.resource} not found`)
       }
 
-      return res
+      return output
     } catch (e: any) {
       Log.error(`${typeof this.resource}::GetOneBy ${e.stack}`)
 

@@ -18,10 +18,10 @@ export default class BaseDomain {
 
   getORM(tblName: string): Model<Cuisine | Menu | Restaurant | User> {
     return {
-      Users: UserModel(this.connection),
-      Menus: MenuModel(this.connection),
-      Cuisines: CuisineModel(this.connection),
-      Restaurants: RestaurantModel(this.connection),
+      users: UserModel(this.connection),
+      menus: MenuModel(this.connection),
+      cuisines: CuisineModel(this.connection),
+      restaurants: RestaurantModel(this.connection),
     }[tblName]
   }
 

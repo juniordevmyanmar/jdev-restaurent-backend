@@ -1,22 +1,23 @@
 import express from 'express'
 import * as core from 'express-serve-static-core'
-import RequestValidator from '../validator/requestValidator'
-import { CreateUserRequestRule } from '../validator/rules/register'
-import { LoginRequestRule } from '../validator/rules/login'
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistError'
-import { InvalidUserLoginError } from '../errors/invalidUserLogin'
 
 import BaseHandler from './base'
 import HttpStatusCode from '../enum/httpstatus'
-import UserDomain from '../domain/authentication'
+import CrudDomain from '../domain/crud'
+import { RestaurantAttributes } from '../models/restaurant'
+import { MenuAttributes } from '../models/menu'
+import { CuisineAttributes } from '../models/cuisine'
 
-export default class UserHandler extends BaseHandler {
+type RequestType = RestaurantAttributes | MenuAttributes | CuisineAttributes
+
+export default class CrudHandler extends BaseHandler {
   private app: express.Application
-  private userDomain: UserDomain
-  constructor(route: express.Application, userDomain: UserDomain) {
+  private crudDomain: CrudDomain
+  constructor(route: express.Application, crudDomain: CrudDomain) {
     super()
     this.app = route
-    this.userDomain = userDomain
+    this.crudDomain = crudDomain
     this.instantiateRoute()
   }
 
@@ -25,59 +26,67 @@ export default class UserHandler extends BaseHandler {
   }
 
   private instantiateRoute(): void {
-    this.app.post('/register', RequestValidator.validate(CreateUserRequestRule), this.createUser.bind(this))
-    this.app.post('/login', RequestValidator.validate(LoginRequestRule), this.userSignUp.bind(this))
+    this.app.post('/api/:model/', this.createResource.bind(this))
+    this.app.get('/api/:model/', this.getResourceList.bind(this))
+    this.app.get('/api/:model/:id', this.getResourceById.bind(this))
+    // this.app.post('/login', RequestValidator.validate(LoginRequestRule), this.userSignUp.bind(this))
   }
 
-  private async createUser(
-    req: core.Request<
-      { name: string; email?: string; password?: string; phone?: string; address?: string },
-      { data: { name: string; email?: string; password?: string; address?: string } },
-      any,
-      Record<string, any>
-    >,
+  private async createResource(
+    req: core.Request<{ model: string }, RequestType, any, Record<string, any>>,
     res: core.Response<any, Record<string, any>, number>,
   ) {
     const payload = req.body
 
+    const tblName = req.params.model
+
     try {
-      const { id } = await this.userDomain.createUser(
-        payload.name,
-        payload.email,
-        payload.password,
-        payload.address,
-        payload.phone,
-      )
-      res.status(HttpStatusCode.OK).json(this.resBody(id))
+      const resp = await this.crudDomain.getCrudDomain(tblName).create(payload)
+      res.status(HttpStatusCode.OK).json(this.resBody(resp))
     } catch (err: any) {
       if (err instanceof UserAlreadyExistsError) {
         res.status(HttpStatusCode.BAD_REQUEST).json(this.badRequestError(err.message, err.errors()))
         return
       }
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(this.internalServerError('Failed to set User'))
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(this.internalServerError(`Failed to set ${tblName}`))
     }
   }
 
-  private async userSignUp(
-    req: core.Request<
-      {},
-      { data: { name: string; email?: string; password?: string; dateOfBirth?: string; address?: string } },
-      any,
-      Record<string, any>
-    >,
+  private async getResourceList(
+    req: core.Request<{ model: string }, RequestType, any, { limit: number; offset: number }>,
     res: core.Response<any, Record<string, any>, number>,
   ) {
-    const payload = req.body
+    const tblName = req.params.model
 
+    const { limit, offset } = req.query
     try {
-      const { token } = await this.userDomain.loginUser(payload.email, payload.password)
-      res.status(HttpStatusCode.OK).json(this.resBody({ token: token }))
+      const resp = await this.crudDomain.getCrudDomain(tblName).GetAll(limit, offset)
+      res.status(HttpStatusCode.OK).json(this.resBody(resp))
     } catch (err: any) {
-      if (err instanceof InvalidUserLoginError) {
+      if (err instanceof UserAlreadyExistsError) {
         res.status(HttpStatusCode.BAD_REQUEST).json(this.badRequestError(err.message, err.errors()))
         return
       }
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(this.internalServerError('user login failed'))
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(this.internalServerError(`Failed to set ${tblName}`))
+    }
+  }
+
+  private async getResourceById(
+    req: core.Request<{ model: string; id: string }, RequestType, any, any>,
+    res: core.Response<any, Record<string, any>, number>,
+  ) {
+    const tblName = req.params.model
+
+    const { id } = req.params
+    try {
+      const resp = await this.crudDomain.getCrudDomain(tblName).GetOneBy({ id })
+      res.status(HttpStatusCode.OK).json(this.resBody(resp))
+    } catch (err: any) {
+      if (err instanceof UserAlreadyExistsError) {
+        res.status(HttpStatusCode.BAD_REQUEST).json(this.badRequestError(err.message, err.errors()))
+        return
+      }
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(this.internalServerError(`Failed to set ${tblName}`))
     }
   }
 }

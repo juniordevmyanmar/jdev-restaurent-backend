@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize, UUIDV4 } from 'sequelize'
 import { BaseModel } from './base'
 
-interface RestaurantAttributes {
+export interface RestaurantAttributes {
   id: string
   name: string
   address: string
@@ -15,7 +15,7 @@ interface RestaurantAttributes {
   deletedAt?: Date
 }
 
-export interface RestaurantInput extends Required<RestaurantAttributes> {}
+export interface RestaurantInput extends Required<RestaurantAttributes> { }
 
 export class Restaurant extends BaseModel<RestaurantAttributes, RestaurantInput> implements RestaurantAttributes {
   public id!: string
