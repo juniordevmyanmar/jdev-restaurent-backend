@@ -79,7 +79,7 @@ export default class CrudHandler extends BaseHandler {
 
     const { id } = req.params
     try {
-      const resp = await this.crudDomain.getCrudDomain(tblName).GetOneBy({ id })
+      const resp = await this.crudDomain.getCrudDomain(tblName).GetOneBy({ id } as any)
       res.status(HttpStatusCode.OK).json(this.resBody(resp))
     } catch (err: any) {
       if (err instanceof UserAlreadyExistsError) {

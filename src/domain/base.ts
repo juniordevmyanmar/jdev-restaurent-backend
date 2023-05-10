@@ -22,7 +22,7 @@ export default class BaseDomain {
       menus: MenuModel(this.connection),
       cuisines: CuisineModel(this.connection),
       restaurants: RestaurantModel(this.connection),
-    }[tblName]
+    }[tblName] as any
   }
 
   escapeSQLStr(str: string): string {

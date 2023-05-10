@@ -1,4 +1,4 @@
-import { Sequelize, UniqueConstraintError, ValidationErrorItem } from 'sequelize'
+import { InstanceDestroyOptions, Sequelize, UniqueConstraintError, ValidationErrorItem } from 'sequelize'
 import { Log } from '../utils/log'
 import BaseDomain from './base'
 import { DataTypes, Model, Optional, UUIDV4 } from 'sequelize'
@@ -19,7 +19,7 @@ type Resource<T> = T
 type res = Resource<User | Menu | Cuisine | Restaurant>
 
 export default class CrudDomain extends BaseDomain {
-  private resource
+  private resource: any
   constructor(db: Sequelize | null, tblName: string) {
     super(db, tblName)
     this.resource = this.getORM(tblName)
@@ -110,7 +110,7 @@ export default class CrudDomain extends BaseDomain {
         throw new ResourceUpdateError(`${typeof this.resource} not found`)
       }
 
-      return output[0]
+
     } catch (e: any) {
       Log.error(`${typeof this.resource}::UpdateBy ${e.stack}`)
       throw e
@@ -119,9 +119,7 @@ export default class CrudDomain extends BaseDomain {
 
   public async DeleteBy(res: res): Promise<boolean> {
     try {
-      this.resource.destroy({
-        where: res,
-      })
+      await this.resource?.destroy({ where: { ...res } } as InstanceDestroyOptions)
       return true
     } catch (e: any) {
       Log.error(`${typeof this.resource}::UpdateBy ${e.stack}`)
